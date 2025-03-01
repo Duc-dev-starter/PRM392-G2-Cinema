@@ -3,8 +3,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from './schemas/users.schema';
 import { RegisterUserDto } from './dto';
-import { isEmptyObject } from 'src/utils';
-import { CustomHttpException } from 'src/exceptions';
+import { isEmptyObject } from '../utils';
+import { CustomHttpException } from '../exceptions';
 import * as bcrypt from 'bcrypt';
 import { UserWithoutPassword } from './users.interface';
 

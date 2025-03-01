@@ -1,4 +1,4 @@
-import { Role } from "src/enums";
+import { Role } from "../enums";
 import { User } from "./schemas/users.schema";
 
 export type UserRole = Role.Admin | Role.User;

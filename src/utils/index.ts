@@ -1,5 +1,5 @@
 import { HttpStatus } from '@nestjs/common';
-import { CustomHttpException } from 'src/exceptions';
+import { CustomHttpException } from '../exceptions';
 import { PaginationResponseModel, SearchPaginationResponseModel } from 'src/models';
 
 

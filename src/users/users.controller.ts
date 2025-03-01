@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Param, HttpStatus } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { RegisterUserDto } from './dto';
-import { CustomHttpException } from 'src/exceptions';
+import { CustomHttpException } from '../exceptions';
 import { formatResponse } from 'src/utils';
 import { UserWithoutPassword } from './users.interface';
 
