@@ -1,44 +1,38 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, HttpStatus } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
+import { RegisterUserDto } from './dto';
+import { CustomHttpException } from 'src/exceptions';
+import { formatResponse } from 'src/utils';
+import { UserWithoutPassword } from './users.interface';
 
-class CreateUserDto {
-  name: string;
-  email: string;
-  password: string;
-}
 
 @ApiTags('Users')
-@Controller('users')
+@Controller('api/users')
 export class UsersController {
   constructor(private readonly userService: UsersService) { }
 
   @Post()
-  @ApiOperation({ summary: 'Create a new user' })
-  @ApiResponse({ status: 201, description: 'User successfully created' })
-  @ApiResponse({ status: 400, description: 'Invalid input' })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        name: { type: 'string', example: 'John Doe' },
-        email: { type: 'string', example: 'john@example.com' },
-        password: { type: 'string', example: '123456' },
-      },
-    },
-  })
-  async createUser(@Body() createUserDto: CreateUserDto) {
-    return this.userService.createUser(
-      createUserDto.name,
-      createUserDto.email,
-      createUserDto.password,
-    );
+  @ApiOperation({ summary: 'Register User' })
+  @ApiBody({ type: RegisterUserDto })
+  async create(@Body() payload: RegisterUserDto) {
+    if (!payload) {
+      throw new CustomHttpException(HttpStatus.NOT_FOUND, 'You need to send data');
+    }
+    const item = await this.userService.create(payload);
+
+    return formatResponse<UserWithoutPassword>(item);
   }
 
   @Get()
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: 200, description: 'List of users' })
-  async getUsers() {
-    return this.userService.getUsers();
+  async findAll() {
+    return this.userService.findAll();
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.userService.findOne(+id);
   }
 }
