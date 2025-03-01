@@ -1,14 +1,16 @@
-import { Controller, Get, Post, Body, Param, HttpStatus } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Param, HttpStatus, Put } from '@nestjs/common';
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
-import { RegisterUserDto } from './dto';
+import { RegisterUserDto, UpdateUserDto } from './dto';
 import { CustomHttpException } from '../exceptions';
-import { formatResponse } from 'src/utils';
+import { formatResponse } from '../utils';
 import { UserWithoutPassword } from './users.interface';
+import { User } from './schemas/users.schema';
+import { API, COLLECTION_NAME } from '../constants';
 
 
-@ApiTags('Users')
-@Controller('api/users')
+@ApiTags(COLLECTION_NAME.USER)
+@Controller(API.USERS)
 export class UsersController {
   constructor(private readonly userService: UsersService) { }
 
@@ -25,14 +27,22 @@ export class UsersController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all users' })
-  @ApiResponse({ status: 200, description: 'List of users' })
+  @ApiOperation({ summary: 'Get users' })
   async findAll() {
     return this.userService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+  @ApiOperation({ summary: 'Get user' })
+  async findOne(@Param('id') id: string) {
+    const item = await this.userService.findOne(id);
+    return formatResponse<User>(item);
+  }
+
+  @Put(':id')
+  @ApiOperation({ summary: 'Update user' })
+  async updateUser(@Param('id') id: string, @Body() payload: UpdateUserDto) {
+    const item = await this.userService.updateUser(id, payload);
+    return formatResponse<User>(item);
   }
 }
