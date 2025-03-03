@@ -1,4 +1,4 @@
-import { PaginationResponseModel } from './pagination.model';
+import { PaginationResponseModel, PaginationRequestModel } from './pagination.model';
 import { SearchPaginationRequestModel, SearchPaginationResponseModel } from './search-pagination.model';
 
-export { SearchPaginationRequestModel, SearchPaginationResponseModel, PaginationResponseModel };
+export { SearchPaginationRequestModel, SearchPaginationResponseModel, PaginationResponseModel, PaginationRequestModel };

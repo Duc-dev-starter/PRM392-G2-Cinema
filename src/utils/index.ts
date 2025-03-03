@@ -32,15 +32,24 @@ export const isEmptyObject = (obj: any): boolean => {
     return !Object.keys(obj).length;
 };
 
-export const validatePaginationInput = (model: any) => {
-    if (!model) {
-        throw new CustomHttpException(HttpStatus.NOT_FOUND, 'You need to send data');
+export const validateInput = (payload: any) => {
+    if (!payload) {
+        throw new CustomHttpException(HttpStatus.BAD_REQUEST, 'You need to send data');
     }
 
-    if (model.pageInfo.pageNum <= 0 || model.pageInfo.pageSize <= 0) {
-        throw new CustomHttpException(
-            HttpStatus.BAD_REQUEST,
-            'Page num and page size must be equal or greater than 1',
-        );
+    if (payload.pageInfo) {
+        if (!payload.pageInfo.pageNum || !payload.pageInfo.pageSize) {
+            throw new CustomHttpException(
+                HttpStatus.BAD_REQUEST,
+                'Page num and page size are required in pageInfo',
+            );
+        }
+
+        if (payload.pageInfo.pageNum <= 0 || payload.pageInfo.pageSize <= 0) {
+            throw new CustomHttpException(
+                HttpStatus.BAD_REQUEST,
+                'Page num and page size must be equal or greater than 1',
+            );
+        }
     }
 };

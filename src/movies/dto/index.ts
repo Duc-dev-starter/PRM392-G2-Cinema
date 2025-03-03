@@ -1,2 +1,4 @@
+import { SearchMovieDto } from './search-movie.dto';
 import { CreateMovieDto } from './create-movie.dto';
-export { CreateMovieDto } 
+import { SearchWithPaginationDto } from './search-with-pagination.dto'
+export { CreateMovieDto, SearchMovieDto, SearchWithPaginationDto } 

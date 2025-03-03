@@ -1,13 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, UseGuards, HttpCode } from '@nestjs/common';
 import { MoviesService } from './movies.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { CustomHttpException } from 'src/exceptions';
-import { formatResponse } from '../utils';
+import { formatResponse, validateInput } from '../utils';
 import { Movie } from './schemas/movie.schema';
 import { API, COLLECTION_NAME } from '../constants';
-import { AuthGuard } from '@nestjs/passport';
+import { Public } from '../decorators/public.decorator';
+import { SearchMovieDto, SearchWithPaginationDto } from './dto';
+import { SearchPaginationResponseModel } from '../models';
 
 @ApiTags(COLLECTION_NAME.MOVIE)
 @Controller(API.MOVIES)
@@ -16,21 +17,23 @@ export class MoviesController {
 
   @Post()
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Create movie' })
   @ApiBody({ type: CreateMovieDto })
   async create(@Body() payload: CreateMovieDto) {
-    if (!payload) {
-      throw new CustomHttpException(HttpStatus.NOT_FOUND, 'You need to send data');
-    }
+    validateInput(payload);
     const item = await this.moviesService.create(payload);
-
     return formatResponse<Movie>(item);
   }
 
-  @Get()
-  findAll() {
-    return this.moviesService.findAll();
+  @Public()
+  @ApiBody({ type: SearchMovieDto })
+  @HttpCode(HttpStatus.OK)
+  @Post('search')
+  async findAll(@Body() model: SearchWithPaginationDto) {
+    validateInput(model);
+    const result: SearchPaginationResponseModel<Movie> =
+      await this.moviesService.findAll(model);
+    return formatResponse<SearchPaginationResponseModel<Movie>>(result);
   }
 
   @Get(':id')
