@@ -3,8 +3,10 @@ export const COLLECTION_NAME = {
     USER: 'User',
     MOVIE: 'Movie',
     THEATHER: 'Theater',
+    SCREEN: 'Screen',
     TICKET: 'Ticket',
     REVIEW: 'Review',
+    SEAT: 'Seat',
     CART: 'Cart',
     PURCHASE: 'Purchase',
 };
