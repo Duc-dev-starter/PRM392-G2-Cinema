@@ -81,4 +81,15 @@ export class UsersService {
 
     return updatedUser;
   }
+
+  async findByEmail(email: string) {
+    if (!email) {
+      throw new CustomHttpException(HttpStatus.BAD_REQUEST, 'User email is required');
+    }
+    const user = this.userModel.findOne({ email }).exec();
+    if (!user) {
+      throw new CustomHttpException(HttpStatus.NOT_FOUND, 'User not exists');
+    }
+    return user;
+  }
 }
