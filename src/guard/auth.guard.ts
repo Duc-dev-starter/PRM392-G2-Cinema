@@ -9,7 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 import { ConfigService } from '@nestjs/config';
-import { UsersService } from 'src/users/users.service';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -29,6 +29,7 @@ export class AuthGuard implements CanActivate {
             // 💡 See this condition
             return true;
         }
+        console.log('JWT_SECRET:', this.config.get<string>('JWT_SECRET'));
 
         const request = context.switchToHttp().getRequest();
         const token = this.extractTokenFromHeader(request);
@@ -43,9 +44,10 @@ export class AuthGuard implements CanActivate {
             // so that we can access it in our route handlers
             console.log(payload);
 
-            const user = await this.usersService.findOne(payload.id);
-
+            const user = await this.usersService.findOne(payload.userId);
+            console.log(user);
             if (!user) {
+                console.log('vao loi')
                 throw new UnauthorizedException('Invalid user.');
             }
 

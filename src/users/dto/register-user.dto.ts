@@ -29,7 +29,7 @@ export default class RegisterUserDto {
     @IsString()
     name: string;
 
-    @ApiProperty({ example: 'Category for electronic devices' })
+    @ApiProperty({ example: 'leminhduck@gmail.com' })
     @IsEmail()
     @IsNotEmpty()
     email: string;
