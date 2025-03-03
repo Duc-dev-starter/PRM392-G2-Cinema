@@ -28,6 +28,7 @@ export class MoviesService {
     const newMovie = new this.movieModel(payload);
     return await newMovie.save();
   }
+
   async findAll(payload: SearchWithPaginationDto): Promise<SearchPaginationResponseModel<Movie>> {
     const searchCondition = {
       ...new SearchMovieDto(),

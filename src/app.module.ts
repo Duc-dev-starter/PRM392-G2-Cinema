@@ -9,6 +9,10 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './guard/auth.guard';
+import { ScreensModule } from './screens/screens.module';
+import { SeatsModule } from './seats/seats.module';
+import { ShowtimesModule } from './showtimes/showtimes.module';
+import { BookingsModule } from './bookings/bookings.module';
 
 @Module({
   imports: [
@@ -27,7 +31,11 @@ import { AuthGuard } from './guard/auth.guard';
         useNewUrlParser: true,
         useUnifiedTopology: true,
       }),
-    })
+    }),
+    ScreensModule,
+    SeatsModule,
+    ShowtimesModule,
+    BookingsModule
 
   ],
   controllers: [AppController],

@@ -1,13 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, UseGuards, HttpCode } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, HttpCode } from '@nestjs/common';
 import { MoviesService } from './movies.service';
-import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { formatResponse, validateInput } from '../utils';
 import { Movie } from './schemas/movie.schema';
 import { API, COLLECTION_NAME } from '../constants';
 import { Public } from '../decorators/public.decorator';
-import { SearchMovieDto, SearchWithPaginationDto } from './dto';
+import { CreateMovieDto, SearchWithPaginationDto } from './dto';
 import { SearchPaginationResponseModel } from '../models';
 
 @ApiTags(COLLECTION_NAME.MOVIE)
