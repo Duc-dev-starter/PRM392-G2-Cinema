@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, UseGuard
 import { MoviesService } from './movies.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { formatResponse, validateInput } from '../utils';
 import { Movie } from './schemas/movie.schema';
 import { API, COLLECTION_NAME } from '../constants';
@@ -26,7 +26,8 @@ export class MoviesController {
   }
 
   @Public()
-  @ApiBody({ type: SearchMovieDto })
+  @ApiBody({ type: SearchWithPaginationDto })
+  @ApiOperation({ summary: 'Search movies with condition' })
   @HttpCode(HttpStatus.OK)
   @Post('search')
   async findAll(@Body() model: SearchWithPaginationDto) {
@@ -36,9 +37,13 @@ export class MoviesController {
     return formatResponse<SearchPaginationResponseModel<Movie>>(result);
   }
 
+  @Public()
+  @ApiOperation({ summary: 'Search movie' })
+  @ApiParam({ name: 'id', type: String, description: 'Movie ID', example: '67c55f33bb935ad781b1a309' })
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.moviesService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    const result = await this.moviesService.findOne(id);
+    return formatResponse(result);
   }
 
   @Patch(':id')

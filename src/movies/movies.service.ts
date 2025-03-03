@@ -74,8 +74,8 @@ export class MoviesService {
   }
 
 
-  findOne(id: number) {
-    return `This action returns a #${id} movie`;
+  async findOne(id: string): Promise<Movie | null> {
+    return await this.movieModel.findById(id).exec();
   }
 
   update(id: number, updateMovieDto: UpdateMovieDto) {
