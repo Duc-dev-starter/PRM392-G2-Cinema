@@ -34,9 +34,6 @@ export class Movie {
 
     @Prop({ required: true })
     trailer: string;
-
-    @Prop({ default: false })
-    isDeleted: boolean;
 }
 
 export const MovieSchema = SchemaFactory.createForClass(Movie);

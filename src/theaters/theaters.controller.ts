@@ -1,34 +1,37 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
 import { TheatersService } from './theaters.service';
-import { CreateTheaterDto } from './dto/create-theater.dto';
-import { UpdateTheaterDto } from './dto/update-theater.dto';
+import { CreateTheaterDto } from './dto';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam } from '@nestjs/swagger';
+import { Public } from '../decorators/public.decorator';
+import { SearchTheaterDto } from './dto/search-theater.dto';
+import { formatResponse } from '../utils';
 
-@Controller('theaters')
+@Controller('/api/theaters')
 export class TheatersController {
   constructor(private readonly theatersService: TheatersService) {}
 
-  @Post()
+   @Post()
+    @ApiBearerAuth()
+    @ApiOperation({ summary: 'Create theater' })
+    @ApiBody({ type: CreateTheaterDto })
   create(@Body() createTheaterDto: CreateTheaterDto) {
     return this.theatersService.create(createTheaterDto);
   }
-
+  
+  @Public()
+  @ApiOperation({ summary: 'Find theaters' })
   @Get()
-  findAll() {
-    return this.theatersService.findAll();
-  }
+async findAll(@Query() queryParams: SearchTheaterDto) {
+    const result = await this.theatersService.findAll(queryParams);
+    return formatResponse(result);
+}
 
+  @ApiOperation({ summary: 'Find theater' })
+  @Public()
+  @ApiParam({ name: 'id', type: String, description: 'Theater ID', example: '67c919f0d284fdf03469bf48' })
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.theatersService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTheaterDto: UpdateTheaterDto) {
-    return this.theatersService.update(+id, updateTheaterDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.theatersService.remove(+id);
+      const result = this.theatersService.findOne(id);
+      return formatResponse(result);
   }
 }

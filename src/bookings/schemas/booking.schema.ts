@@ -7,14 +7,14 @@ export type BookingDocument = HydratedDocument<Booking>;
 
 @Schema({ timestamps: true })
 export class Booking {
-    @Prop({ type: [{ type: Types.ObjectId, ref: COLLECTION_NAME.USER }], default: [] })
-    userId: string;
+    @Prop({ type: Types.ObjectId, ref: COLLECTION_NAME.USER, required: true })
+    userId: Types.ObjectId;
 
-    @Prop({ type: [{ type: Types.ObjectId, ref: COLLECTION_NAME.MOVIE }], default: [] })
-    showtimeId: string;
+    @Prop({ type: Types.ObjectId, ref: COLLECTION_NAME.SHOWTIME, required: true })
+    showtimeId: Types.ObjectId;
 
-    @Prop({ type: [{ type: Types.ObjectId, ref: COLLECTION_NAME.SEAT }], default: [] })
-    seatIds: string[];
+    @Prop({ type: [Types.ObjectId], ref: COLLECTION_NAME.SEAT, required: true })
+    seatIds: Types.ObjectId[];
 
     @Prop({ required: true })
     totalPrice: number;
@@ -24,3 +24,4 @@ export class Booking {
 }
 
 export const BookingSchema = SchemaFactory.createForClass(Booking);
+

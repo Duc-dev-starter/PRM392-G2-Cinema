@@ -14,7 +14,6 @@ export class CreateMovieDto {
         rating: number = 0,
         banner: string = '',
         trailer: string = '',
-        isDeleted: boolean = false,
     ) {
         this.title = title;
         this.description = description;
@@ -26,7 +25,6 @@ export class CreateMovieDto {
         this.rating = rating;
         this.banner = banner;
         this.trailer = trailer;
-        this.isDeleted = isDeleted;
     }
 
     @ApiProperty({ example: 'Inception', description: 'Movie title' })
@@ -86,8 +84,4 @@ export class CreateMovieDto {
     @IsUrl()
     trailer: string;
 
-    @ApiProperty({ example: false })
-    @IsOptional()
-    @IsBoolean()
-    isDeleted?: boolean;
 }

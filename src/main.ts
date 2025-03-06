@@ -13,10 +13,10 @@ async function bootstrap() {
 
   app.enableCors();
 
-  // setTimeout(() => {
-  //   const url = `http://localhost:${process.env.API_PORT}/api/docs`;
-  //   exec(`start ${url}`); // Windows
-  // }, 2000);
+  setTimeout(() => {
+    const url = `http://localhost:${process.env.API_PORT}/api/docs`;
+    exec(`start ${url}`); // Windows
+  }, 2000);
 
 
 

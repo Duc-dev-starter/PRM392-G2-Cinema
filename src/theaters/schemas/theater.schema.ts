@@ -1,19 +1,19 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Types } from 'mongoose';
-import { COLLECTION_NAME } from '../../constants';
+import { HydratedDocument } from 'mongoose';
 
-export type TheatherDocument = HydratedDocument<Theather>;
+export type TheaterDocument = HydratedDocument<Theater>;
 
 @Schema({ timestamps: true })
-export class Theather {
+export class Theater {
     @Prop({ required: true })
     name: string;
 
     @Prop({ required: true })
     address: string;
 
-    @Prop({ type: [{ type: Types.ObjectId, ref: COLLECTION_NAME.SCREEN }], default: [] })
-    screenIds: Types.ObjectId[];
+    @Prop({ required: true })
+    district: string;
+
 }
 
-export const TheatherSchema = SchemaFactory.createForClass(Theather);
+export const TheaterSchema = SchemaFactory.createForClass(Theater);
