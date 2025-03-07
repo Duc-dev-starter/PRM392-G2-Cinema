@@ -1,2 +1,3 @@
 import { Role } from "./role.enum";
-export { Role }
+import {MovieRated,MovieStatus, MovieGenre} from './movie.enum'
+export { Role,MovieStatus,MovieRated, MovieGenre }

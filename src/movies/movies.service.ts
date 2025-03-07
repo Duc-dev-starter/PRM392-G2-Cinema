@@ -1,13 +1,12 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { CreateMovieDto } from './dto/create-movie.dto';
-import { UpdateMovieDto } from './dto/update-movie.dto';
-import { formatPaginationResult, isEmptyObject } from '../utils';
+import {  isEmptyObject } from '../utils';
 import { CustomHttpException } from '../exceptions';
 import { InjectModel } from '@nestjs/mongoose';
 import { Movie, MovieDocument } from './schemas/movie.schema';
 import { Model } from 'mongoose';
-import { SearchMovieDto, SearchWithPaginationDto } from './dto';
-import { SearchPaginationResponseModel } from '../models';
+import { CreateMovieDto, SearchMovieDto } from './dto';
+import { PaginationResponseModel, SearchPaginationResponseModel } from '../models';
+import { UpdateMovieDto } from './dto/update-movie.dto';
 
 @Injectable()
 export class MoviesService {
@@ -29,61 +28,57 @@ export class MoviesService {
     return await newMovie.save();
   }
 
-  async findAll(payload: SearchWithPaginationDto): Promise<SearchPaginationResponseModel<Movie>> {
-    const searchCondition = {
-      ...new SearchMovieDto(),
-      ...payload.searchCondition,
-    };
-
-    console.log(searchCondition);
-    const { actors, director, genres, keyword } = searchCondition;
-    const { pageNum, pageSize } = payload.pageInfo;
-
+  async findAll(params: SearchMovieDto) {
+    const { genres, rated, rating, status, title, theaters,pageNum, pageSize } = params;
+    console.log(params);
+    
     const query: any = {};
 
-    if (keyword) {
-      query.title = { $regex: keyword, $options: 'i' };
-    }
-    if (genres && genres.length > 0) {
-      query.genres = { $in: genres };
-    }
-    if (director) {
-      query.director = director;
-    }
-    if (actors && actors.length > 0) {
-      query.actors = { $in: actors };
-    }
-
-    const total = await this.movieModel.countDocuments(query);
-
-    const items = await this.movieModel
-      .find(query)
-      .sort({ createdAt: -1 })
-      .skip((pageNum - 1) * pageSize)
-      .limit(pageSize)
-      .exec();
-
-    const data = new SearchPaginationResponseModel<Movie>();
-    const result = formatPaginationResult<Movie>(data, items, {
-      pageNum,
-      pageSize,
-      totalItems: total,
-      totalPages: Math.ceil(total / pageSize),
-    });
-
-    return result;
+    if (title) query.title = new RegExp(title, 'i'); 
+    if (rated) query.rated = rated; 
+    if (status) query.status = status; 
+    if (rating) query.rating = { $gte: rating }; 
+    if (genres && genres.length > 0) query.genres = { $in: genres }; 
+    if (theaters && theaters.length > 0) {
+      query.theaters = { $in: theaters }; 
   }
+
+    const totalItems = await this.movieModel.countDocuments(query);
+    const items = await this.movieModel
+        .find(query)
+        .skip((pageNum - 1) * pageSize)
+        .populate('theaters')
+        .limit(pageSize)
+        .lean()
+        .exec();
+    const paginationInfo = new PaginationResponseModel(
+        pageNum, 
+        pageSize, 
+        totalItems, 
+        Math.ceil(totalItems / pageSize)
+    );
+
+    return new SearchPaginationResponseModel(items, paginationInfo);
+}
 
 
   async findOne(id: string): Promise<Movie | null> {
-    return await this.movieModel.findById(id).exec();
+    const item = await this.movieModel
+    .findById(id)
+    .populate({
+      path: 'theaters',
+      model: 'Theater'
+  })
+    .exec();
+
+    if(!item){
+      throw new CustomHttpException(HttpStatus.NOT_FOUND, 'Movie not found');
+    }
+    return item;
   }
 
   update(id: number, updateMovieDto: UpdateMovieDto) {
     return `This action updates a #${id} movie`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} movie`;
-  }
 }

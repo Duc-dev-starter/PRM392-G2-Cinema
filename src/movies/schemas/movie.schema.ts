@@ -1,7 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
+import { MovieGenre, MovieRated, MovieStatus } from '../../enums';
+import { COLLECTION_NAME } from '../../constants';
 
 export type MovieDocument = HydratedDocument<Movie>;
+
 
 @Schema({ timestamps: true })
 export class Movie {
@@ -11,14 +14,20 @@ export class Movie {
     @Prop({ required: true })
     description: string;
 
-    @Prop({ required: true, type: [String] })
-    genres: string[];
+    @Prop({ type: [String], enum: MovieGenre, required: true })
+    genres: MovieGenre[];
 
     @Prop({ required: true })
     releaseDate: Date;
 
     @Prop({ required: true })
     duration: number;
+
+    @Prop({ enum: MovieStatus })
+    status: MovieStatus;
+
+    @Prop({ enum: MovieRated })
+    rated: MovieRated;
 
     @Prop({ required: true })
     director: string;
@@ -34,6 +43,9 @@ export class Movie {
 
     @Prop({ required: true })
     trailer: string;
+
+    @Prop({ type: [{ type: Types.ObjectId, ref: COLLECTION_NAME.THEATER }], default: [] })
+    theaters: Types.ObjectId[];  
 }
 
 export const MovieSchema = SchemaFactory.createForClass(Movie);

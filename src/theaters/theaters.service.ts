@@ -51,6 +51,7 @@ export class TheatersService {
 
 
   async findOne(id: string): Promise<Theater | null> {
+    console.log(Theater.name);
     return await this.theaterModel.findById(id).exec();
   }
 

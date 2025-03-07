@@ -9,14 +9,14 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalFilters(new CustomExceptionFilter());
   SwaggerConfig.setupSwagger(app);
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
   app.enableCors();
 
-  setTimeout(() => {
-    const url = `http://localhost:${process.env.API_PORT}/api/docs`;
-    exec(`start ${url}`); // Windows
-  }, 2000);
+  // setTimeout(() => {
+  //   const url = `http://localhost:${process.env.API_PORT}/api/docs`;
+  //   exec(`start ${url}`); // Windows
+  // }, 2000);
 
 
 

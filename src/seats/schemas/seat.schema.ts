@@ -6,7 +6,7 @@ export type SeatDocument = HydratedDocument<Seat>;
 
 @Schema({ timestamps: true })
 export class Seat {
-    @Prop({ type: Types.ObjectId, ref: COLLECTION_NAME.THEATHER, required: true })
+    @Prop({ type: Types.ObjectId, ref: COLLECTION_NAME.THEATER, required: true })
     theatherId: Types.ObjectId;
 
     @Prop({ required: true })

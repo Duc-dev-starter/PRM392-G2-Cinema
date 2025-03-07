@@ -1,12 +1,24 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsNotEmpty, IsString, IsOptional, IsDate, IsArray, IsNumber, Min, Max, IsUrl, IsBoolean } from 'class-validator';
+import {
+    IsNotEmpty,
+    IsString,
+    IsOptional,
+    IsDate,
+    IsArray,
+    IsNumber,
+    Min,
+    Max,
+    IsUrl,
+    IsEnum,
+} from 'class-validator';
+import { MovieGenre, MovieRated, MovieStatus } from '../../enums';
 
 export class CreateMovieDto {
     constructor(
         title: string = '',
         description: string = '',
-        genres: string[] = [],
+        genres: MovieGenre[] = [],
         releaseDate: Date = new Date(),
         duration: number = 0,
         director: string = '',
@@ -14,6 +26,8 @@ export class CreateMovieDto {
         rating: number = 0,
         banner: string = '',
         trailer: string = '',
+        status: MovieStatus = MovieStatus.UPCOMING, 
+        rated: MovieRated = MovieRated.GENERAL,
     ) {
         this.title = title;
         this.description = description;
@@ -22,9 +36,11 @@ export class CreateMovieDto {
         this.duration = duration;
         this.director = director;
         this.actors = actors;
+        this.rated = rated;
         this.rating = rating;
         this.banner = banner;
         this.trailer = trailer;
+        this.status = status;
     }
 
     @ApiProperty({ example: 'Inception', description: 'Movie title' })
@@ -37,11 +53,17 @@ export class CreateMovieDto {
     @IsString()
     description: string;
 
-    @ApiProperty({ example: ['Sci-Fi', 'Thriller'], description: 'List of genres' })
+    @ApiProperty({
+        example: [MovieGenre.ACTION, MovieGenre.SCIFI],
+        enum: MovieGenre,
+        isArray: true,
+        description: 'List of movie genres',
+    })
     @IsArray()
+    @IsEnum(MovieGenre, { each: true }) // Kiểm tra từng phần tử trong mảng
     @IsNotEmpty()
-    @IsString({ each: true })
-    genres: string[];
+    genres: MovieGenre[];
+    
 
     @ApiProperty({ example: '2010-07-16T00:00:00.000Z', description: 'Release date' })
     @IsDate()
@@ -58,6 +80,15 @@ export class CreateMovieDto {
     @IsNotEmpty()
     @IsString()
     director: string;
+
+    @ApiProperty({
+        example: MovieRated.TEEN,
+        enum: MovieRated,
+        description: 'Movie rated (0: General, 13: Teen, 18: Adult)',
+    })
+    @IsEnum(MovieRated)
+    @IsNotEmpty()
+    rated: MovieRated;
 
     @ApiProperty({ example: ['Leonardo DiCaprio', 'Joseph Gordon-Levitt'], description: 'List of actors' })
     @IsArray()
@@ -84,4 +115,18 @@ export class CreateMovieDto {
     @IsUrl()
     trailer: string;
 
+    @ApiProperty({
+        example: MovieStatus.UPCOMING,
+        enum: MovieStatus,
+        description: 'Movie status (Chưa chiếu, Đang chiếu, Đã chiếu)',
+    })
+    @IsEnum(MovieStatus)
+    @IsOptional()
+    status: MovieStatus;
+
+    @ApiProperty({ example: ['60d5f8f4b4a5a71d3c4e8f4b', '60d5f8f4b4a5a71d3c4e8f4c'], description: 'List of Cinema IDs where the movie is available' })
+    @IsArray()
+    @IsString({ each: true })
+    @IsNotEmpty()
+    theaters: string[];
 }
