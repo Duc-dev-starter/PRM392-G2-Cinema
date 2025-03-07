@@ -29,7 +29,7 @@ export class MoviesService {
   }
 
   async findAll(params: SearchMovieDto) {
-    const { genres, rated, rating, status, title, theaters,pageNum, pageSize } = params;
+    const { genres, rated, rating, status, title,pageNum, pageSize } = params;
     console.log(params);
     
     const query: any = {};
@@ -39,15 +39,12 @@ export class MoviesService {
     if (status) query.status = status; 
     if (rating) query.rating = { $gte: rating }; 
     if (genres && genres.length > 0) query.genres = { $in: genres }; 
-    if (theaters && theaters.length > 0) {
-      query.theaters = { $in: theaters }; 
-  }
 
     const totalItems = await this.movieModel.countDocuments(query);
     const items = await this.movieModel
         .find(query)
         .skip((pageNum - 1) * pageSize)
-        .populate('theaters')
+        .select('-createdAt -updatedAt -__v') 
         .limit(pageSize)
         .lean()
         .exec();
@@ -65,10 +62,7 @@ export class MoviesService {
   async findOne(id: string): Promise<Movie | null> {
     const item = await this.movieModel
     .findById(id)
-    .populate({
-      path: 'theaters',
-      model: 'Theater'
-  })
+    .select('-createdAt -updatedAt -__v')
     .exec();
 
     if(!item){

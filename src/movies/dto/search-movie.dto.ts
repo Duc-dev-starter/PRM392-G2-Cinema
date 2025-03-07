@@ -44,12 +44,4 @@ export class SearchMovieDto extends PaginationRequestModel {
     })
     genres?: MovieGenre[];
 
-    @IsOptional()
-    @IsMongoId({ each: true })
-    @ApiProperty({
-        description: 'Filter movies by theater IDs',
-        required: false,
-        type: [String],
-    })
-    theaters?: string[];
 }

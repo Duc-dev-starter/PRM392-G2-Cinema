@@ -123,10 +123,4 @@ export class CreateMovieDto {
     @IsEnum(MovieStatus)
     @IsOptional()
     status: MovieStatus;
-
-    @ApiProperty({ example: ['60d5f8f4b4a5a71d3c4e8f4b', '60d5f8f4b4a5a71d3c4e8f4c'], description: 'List of Cinema IDs where the movie is available' })
-    @IsArray()
-    @IsString({ each: true })
-    @IsNotEmpty()
-    theaters: string[];
 }

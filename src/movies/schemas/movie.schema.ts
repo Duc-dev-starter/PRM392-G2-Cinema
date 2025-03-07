@@ -43,9 +43,6 @@ export class Movie {
 
     @Prop({ required: true })
     trailer: string;
-
-    @Prop({ type: [{ type: Types.ObjectId, ref: COLLECTION_NAME.THEATER }], default: [] })
-    theaters: Types.ObjectId[];  
 }
 
 export const MovieSchema = SchemaFactory.createForClass(Movie);
