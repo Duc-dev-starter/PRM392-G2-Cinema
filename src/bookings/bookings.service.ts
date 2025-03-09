@@ -5,7 +5,7 @@ import { Model, Types } from 'mongoose';
 import { ScreensService } from 'src/screens/screens.service';
 import { CustomHttpException } from 'src/exceptions';
 import { InjectModel } from '@nestjs/mongoose';
-import { ScreenDocument } from 'src/screens/schemas';
+import { Screen, ScreenDocument } from '../screens/schemas';
 import { Booking, BookingDocument } from './schemas/booking.schema';
 
 @Injectable()
