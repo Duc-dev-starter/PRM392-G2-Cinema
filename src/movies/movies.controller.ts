@@ -25,11 +25,11 @@ export class MoviesController {
   }
 
   @Public()
-    @ApiOperation({ summary: 'Find theaters' })
-    @Get()
+  @ApiOperation({ summary: 'Find theaters' })
+  @Get()
   async findAll(@Query() queryParams: SearchMovieDto) {
-      const result = await this.moviesService.findAll(queryParams);
-      return formatResponse(result);
+    const result = await this.moviesService.findAll(queryParams);
+    return formatResponse(result);
   }
 
   @Public()

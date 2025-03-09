@@ -12,7 +12,6 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
   app.enableCors();
-
   setTimeout(() => {
     const url = `http://localhost:${process.env.API_PORT}/api/docs`;
     exec(`start ${url}`); // Windows

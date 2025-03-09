@@ -1,20 +1,27 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { ScreensService } from './screens.service';
-import { CreateScreenDto } from './dto/create-screen.dto';
 import { UpdateScreenDto } from './dto/update-screen.dto';
+import { Public } from 'src/decorators/public.decorator';
+import { ApiOperation } from '@nestjs/swagger';
+import { CreateScreenDto, SearchScreensDto } from './dto';
+import { formatResponse } from '../utils';
 
-@Controller('screens')
+@Controller('api/screens')
 export class ScreensController {
-  constructor(private readonly screensService: ScreensService) {}
+  constructor(private readonly screensService: ScreensService) { }
 
+  @Public()
   @Post()
   create(@Body() createScreenDto: CreateScreenDto) {
     return this.screensService.create(createScreenDto);
   }
 
+  @Public()
+  @ApiOperation({ summary: 'Find theaters' })
   @Get()
-  findAll() {
-    return this.screensService.findAll();
+  async findAll(@Query() queryParams: SearchScreensDto) {
+    const result = await this.screensService.findAll(queryParams);
+    return formatResponse(result);
   }
 
   @Get(':id')
