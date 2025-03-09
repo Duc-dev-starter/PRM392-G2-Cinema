@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDateString, IsMongoId } from 'class-validator';
+import { IsISO8601, IsMongoId, IsString } from 'class-validator';
 
 export class CreateShowtimeDto {
     @ApiProperty({ description: 'ID của bộ phim', example: '67cab12d4a14be2b62d0e479' })
@@ -10,15 +10,13 @@ export class CreateShowtimeDto {
     @IsMongoId()
     theaterId: string;
 
-    @ApiProperty({ description: 'Ngày chiếu phim (YYYY-MM-DD)', example: '2025-03-07' })
-    @IsDateString()
-    showingDate: Date;
+    @ApiProperty({ description: 'Ngày chiếu phim (ISO 8601)', example: '2025-03-07T00:00:00.000Z' })
+    @IsISO8601()
+    @IsString()
+    showingDate: string;  // Chấp nhận kiểu string từ FE
 
     @ApiProperty({ description: 'Giờ bắt đầu chiếu phim (ISO 8601)', example: '2025-03-07T09:00:00.000Z' })
-    @IsDateString()
-    startTime: Date;
-
-    @ApiProperty({ description: 'Giờ kết thúc chiếu phim (ISO 8601)', example: '2025-03-07T11:00:00.000Z' })
-    @IsDateString()
-    endTime: Date;
+    @IsISO8601()
+    @IsString()
+    startTime: string;  // FE gửi ISO string
 }

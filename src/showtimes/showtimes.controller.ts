@@ -1,9 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Query } from '@nestjs/common';
 import { ShowtimesService } from './showtimes.service';
-import { CreateShowtimeDto } from './dto/create-showtime.dto';
-import { UpdateShowtimeDto } from './dto/update-showtime.dto';
 import { Public } from '../decorators/public.decorator';
-import { ApiBearerAuth, ApiBody, ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam } from '@nestjs/swagger';
+import { formatResponse } from '../utils';
+import { CreateShowtimeDto, SearchShowtimeDto, UpdateShowtimeDto } from './dto';
 
 @Controller('/api/showtimes')
 export class ShowtimesController {
@@ -12,21 +12,28 @@ export class ShowtimesController {
   @Post()
   @Public()
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Create theater' })
+  @ApiOperation({ summary: 'Create showtime' })
   @ApiBody({ type: CreateShowtimeDto })
-  create(@Body() createShowtimeDto: CreateShowtimeDto) {
-    return this.showtimesService.create(createShowtimeDto);
+  async create(@Body() createShowtimeDto: CreateShowtimeDto) {
+    const result = await this.showtimesService.create(createShowtimeDto);
+    return formatResponse(result);
   }
 
   @Public()
+  @ApiOperation({ summary: 'Find showtimes by movie and date' })
   @Get()
-  findAll() {
-    return this.showtimesService.findAll();
+  async findAll(@Query() queryParams: SearchShowtimeDto) {
+    const result = await this.showtimesService.findShowtimesByMovieAndDate(queryParams);
+    return formatResponse(result);
   }
 
+  @ApiOperation({ summary: 'Find showtime' })
+  @Public()
+  @ApiParam({ name: 'id', type: String, description: 'Showtime ID', example: '67c919f0d284fdf03469bf48' })
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.showtimesService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    const result = await this.showtimesService.findOne(id);
+    return formatResponse(result);
   }
 
   @Patch(':id')
@@ -34,8 +41,4 @@ export class ShowtimesController {
     return this.showtimesService.update(+id, updateShowtimeDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.showtimesService.remove(+id);
-  }
 }
