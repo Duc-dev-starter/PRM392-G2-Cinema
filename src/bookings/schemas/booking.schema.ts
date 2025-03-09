@@ -13,8 +13,11 @@ export class Booking {
     @Prop({ type: Types.ObjectId, ref: COLLECTION_NAME.SHOWTIME, required: true })
     showtimeId: Types.ObjectId;
 
-    @Prop({ type: [Types.ObjectId], ref: COLLECTION_NAME.SEAT, required: true })
-    seatIds: Types.ObjectId[];
+    @Prop({ type: Types.ObjectId, ref: COLLECTION_NAME.SCREEN, required: true })
+    screenId: Types.ObjectId; // Phòng chiếu
+
+    @Prop({ type: [{ row: String, number: Number }], required: true })
+    seats: { row: string; number: number }[]; // Danh sách ghế đặt
 
     @Prop({ required: true })
     totalPrice: number;
@@ -24,4 +27,3 @@ export class Booking {
 }
 
 export const BookingSchema = SchemaFactory.createForClass(Booking);
-

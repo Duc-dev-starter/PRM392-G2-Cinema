@@ -12,6 +12,11 @@ export class CreateShowtimeDto {
     @IsMongoId()
     theaterId: string;
 
+    @ApiProperty({ description: 'ID của phòng chiếu', example: '67c919f0d284fdf03469bf48' })
+    @IsNotEmpty()
+    @IsMongoId()
+    screenId: string;
+
     @ApiProperty({ description: 'Ngày chiếu phim (ISO 8601)', example: '2025-03-07T00:00:00.000Z' })
     @IsISO8601()
     @IsNotEmpty()

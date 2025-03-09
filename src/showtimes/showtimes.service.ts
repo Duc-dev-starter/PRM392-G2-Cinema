@@ -22,7 +22,7 @@ export class ShowtimesService {
       throw new CustomHttpException(HttpStatus.BAD_REQUEST, 'Showtime data is empty');
     }
 
-    const { movieId, theaterId, startTime, showingDate } = payload;
+    const { movieId, theaterId, startTime, showingDate, screenId } = payload;
 
     const parsedStartTime = new Date(startTime);
     const parsedShowingDate = new Date(showingDate);
@@ -66,6 +66,7 @@ export class ShowtimesService {
     const newShowtime = new this.showtimeModel({
       movieId: new Types.ObjectId(movieId),
       theaterId: new Types.ObjectId(theaterId),
+      screenId: new Types.ObjectId(screenId),
       showingDate: parsedShowingDate,
       startTime: parsedStartTime,
       endTime,
@@ -78,7 +79,6 @@ export class ShowtimesService {
   async findShowtimesByMovieAndDate(params: SearchShowtimeDto) {
     const { movieId, date, pageNum = 1, pageSize = 10 } = params;
 
-    // Chuyển date sang kiểu Date (MongoDB lưu Date nên so sánh phải cùng kiểu)
     const parsedDate = new Date(date);
     if (isNaN(parsedDate.getTime())) {
       throw new CustomHttpException(HttpStatus.BAD_REQUEST, 'Invalid date format');
@@ -90,12 +90,11 @@ export class ShowtimesService {
       showingDate: parsedDate,
     });
 
-    // Aggregation để nhóm theo theaterId và lấy thông tin rạp với phân trang
     const result = await this.showtimeModel.aggregate([
       {
         $match: {
           movieId: new Types.ObjectId(movieId),
-          showingDate: parsedDate, // So sánh trực tiếp với kiểu Date
+          showingDate: parsedDate,
         },
       },
       {
@@ -106,6 +105,7 @@ export class ShowtimesService {
               _id: '$_id',
               startTime: '$startTime',
               endTime: '$endTime',
+              screenId: '$screenId', // Lưu `screenId` vào đây để lookup tiếp theo
             },
           },
         },
@@ -122,6 +122,14 @@ export class ShowtimesService {
         $unwind: '$theater',
       },
       {
+        $lookup: {
+          from: 'screens',
+          localField: 'showtimes.screenId', // Kết nối với `screenId`
+          foreignField: '_id',
+          as: 'screens',
+        },
+      },
+      {
         $project: {
           _id: 0,
           theater: {
@@ -129,22 +137,28 @@ export class ShowtimesService {
             name: '$theater.name',
             address: '$theater.address',
           },
-          showtimes: 1,
+          showtimes: {
+            _id: 1,
+            startTime: 1,
+            endTime: 1,
+            screen: {
+              _id: { $arrayElemAt: ['$screens._id', 0] },
+              name: { $arrayElemAt: ['$screens.name', 0] },
+              seats: { $arrayElemAt: ['$screens.seats', 0] },
+            },
+          },
         },
       },
-      { $skip: (pageNum - 1) * pageSize }, // Bỏ qua các bản ghi trước trang hiện tại
-      { $limit: pageSize }, // Giới hạn số bản ghi trả về
+      { $skip: (pageNum - 1) * pageSize },
+      { $limit: pageSize },
     ]).exec();
 
-    // Tính tổng số trang
     const totalPages = Math.ceil(totalItems / pageSize);
-
-    // Tạo đối tượng phân trang
     const paginationInfo = new PaginationResponseModel(pageNum, pageSize, totalItems, totalPages);
 
-    // Trả về đối tượng SearchPaginationResponseModel
     return new SearchPaginationResponseModel(result, paginationInfo);
   }
+
 
 
   async findOne(id: string) {

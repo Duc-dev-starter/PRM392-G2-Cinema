@@ -20,6 +20,9 @@ export class Showtime {
 
     @Prop({ required: true })
     endTime: Date;
+
+    @Prop({ type: Types.ObjectId, ref: COLLECTION_NAME.SCREEN, required: true })
+    screenId: Types.ObjectId;
 }
 
 export const ShowtimeSchema = SchemaFactory.createForClass(Showtime);

@@ -35,6 +35,10 @@ export class ScreensService {
 
     const query: any = {};
 
+    // Kiểm tra nếu theaterId tồn tại và convert sang ObjectId
+    if (theaterId) {
+      query.theaterId = new Types.ObjectId(theaterId);
+    }
 
     const totalItems = await this.screenModel.countDocuments(query);
     const items = await this.screenModel
@@ -44,6 +48,7 @@ export class ScreensService {
       .limit(pageSize)
       .lean()
       .exec();
+
     const paginationInfo = new PaginationResponseModel(
       pageNum,
       pageSize,
