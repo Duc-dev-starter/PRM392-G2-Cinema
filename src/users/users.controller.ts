@@ -7,6 +7,7 @@ import { formatResponse } from '../utils';
 import { UserWithoutPassword } from './users.interface';
 import { User } from './schemas/users.schema';
 import { API, COLLECTION_NAME } from '../constants';
+import { Public } from '../decorators/public.decorator';
 
 
 @ApiTags(COLLECTION_NAME.USER)
@@ -14,6 +15,7 @@ import { API, COLLECTION_NAME } from '../constants';
 export class UsersController {
   constructor(private readonly userService: UsersService) { }
 
+  @Public()
   @Post()
   @ApiOperation({ summary: 'Register User' })
   @ApiBody({ type: RegisterUserDto })
@@ -26,6 +28,7 @@ export class UsersController {
     return formatResponse<UserWithoutPassword>(item);
   }
 
+  @Public()
   @Get()
   @ApiOperation({ summary: 'Get users' })
   async findAll() {
@@ -39,6 +42,7 @@ export class UsersController {
     return formatResponse<User>(item);
   }
 
+  @Public()
   @Put(':id')
   @ApiOperation({ summary: 'Update user' })
   async updateUser(@Param('id') id: string, @Body() payload: UpdateUserDto) {
