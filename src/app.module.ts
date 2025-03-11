@@ -13,6 +13,7 @@ import { ScreensModule } from './screens/screens.module';
 import { ShowtimesModule } from './showtimes/showtimes.module';
 import { BookingsModule } from './bookings/bookings.module';
 import { TicketModule } from './ticket/ticket.module';
+import { PaymentsModule } from './payments/payments.module';
 
 @Module({
   imports: [
@@ -35,7 +36,8 @@ import { TicketModule } from './ticket/ticket.module';
     ScreensModule,
     ShowtimesModule,
     BookingsModule,
-    TicketModule
+    TicketModule,
+    PaymentsModule
 
   ],
   controllers: [AppController],

@@ -8,6 +8,7 @@ interface Seat {
     row: string;
     number: number;
     status: string;
+    price: number;
 }
 
 @Schema({ timestamps: true })
@@ -21,7 +22,7 @@ export class Screen {
     @Prop({ required: true })
     capacity: number; // Tổng số ghế
 
-    @Prop({ type: [{ row: String, number: Number, status: String }], default: [] })
+    @Prop({ type: [{ row: String, number: Number, status: String, price: Number }], default: [] })
     seats: Seat[];
 }
 
@@ -32,16 +33,35 @@ ScreenSchema.pre<ScreenDocument>('save', function (next) {
     if (this.seats.length === 0) { // Chỉ tạo ghế nếu chưa có
         const totalSeats = this.capacity;
         const seatsPerRow = 10; // Mỗi hàng có 10 ghế
-        const rows = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'; // Giới hạn 26 hàng
+        const totalRows = Math.ceil(totalSeats / seatsPerRow); // Tính số hàng thực tế
 
-        // Khai báo kiểu dữ liệu rõ ràng cho mảng ghế
+        const rows = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.slice(0, totalRows).split(''); // Chuyển thành mảng
+
+        // Xác định các nhóm hàng
+        const cheapRange = Math.floor(totalRows * 0.2); // 20% hàng đầu & cuối
+        const mediumRange = Math.floor(totalRows * 0.3); // 30% hàng gần giữa
+
+        // Ánh xạ hàng vào giá vé
+        const priceMapping: { [key: string]: number } = {};
+        [...rows].forEach((row, index) => {
+            if (index < cheapRange || index >= totalRows - cheapRange) {
+                priceMapping[row] = 50; // Rẻ nhất
+            } else if (index < cheapRange + mediumRange || index >= totalRows - (cheapRange + mediumRange)) {
+                priceMapping[row] = 75; // Trung bình
+            } else {
+                priceMapping[row] = 100; // Đắt nhất
+            }
+        });
+
         const generatedSeats: Seat[] = [];
         for (let i = 0; i < totalSeats; i++) {
             const row = rows[Math.floor(i / seatsPerRow)];
             const number = (i % seatsPerRow) + 1;
-            generatedSeats.push({ row, number, status: 'available' }); // Mặc định ghế trống
+            const price = priceMapping[row]; // Lấy giá từ mapping
+
+            generatedSeats.push({ row, number, status: 'available', price });
         }
-        this.seats = generatedSeats; // Gán danh sách ghế đã tạo
+        this.seats = generatedSeats;
     }
     next();
 });
