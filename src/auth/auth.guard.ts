@@ -1,22 +1,17 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from '../users/users.service';
+import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
     private jwtService: JwtService,
     private reflector: Reflector,
-    private config: ConfigService,
+    private configService: ConfigService,
     private usersService: UsersService,
   ) {}
 
@@ -25,36 +20,34 @@ export class AuthGuard implements CanActivate {
       context.getHandler(),
       context.getClass(),
     ]);
+
     if (isPublic) {
-      // 💡 See this condition
       return true;
     }
-    console.log('JWT_SECRET:', this.config.get<string>('JWT_SECRET'));
 
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
+    
     if (!token) {
-      throw new UnauthorizedException('Token is missing');
+      throw new UnauthorizedException();
     }
+    
     try {
       const payload = await this.jwtService.verifyAsync(token, {
-        secret: this.config.get<string>('JWT_SECRET'),
+        secret: this.configService.get<string>('JWT_SECRET'),
       });
-      // 💡 We're assigning the payload to the request object here
-      // so that we can access it in our route handlers
-      console.log(payload);
-
-      const user = await this.usersService.findOne(payload.userId);
-      console.log(user);
+      
+      // Verify the user exists in the database
+      const user = await this.usersService.findByEmail(payload.email);
       if (!user) {
-        console.log('vao loi');
-        throw new UnauthorizedException('Invalid user.');
+        throw new UnauthorizedException('User not found');
       }
-
-      request['user'] = user;
+      
+      request['user'] = payload;
     } catch {
-      throw new UnauthorizedException('Invalid token');
+      throw new UnauthorizedException();
     }
+    
     return true;
   }
 
