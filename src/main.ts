@@ -17,8 +17,6 @@ async function bootstrap() {
     exec(`start ${url}`); // Windows
   }, 2000);
 
-
-
   await app.listen(process.env.API_PORT || 5000);
 }
 bootstrap();
