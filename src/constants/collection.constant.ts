@@ -9,5 +9,6 @@ export const COLLECTION_NAME = {
     SEAT: 'Seat',
     CART: 'Cart',
     PURCHASE: 'Purchase',
-    SHOWTIME: 'Showtime'
+    SHOWTIME: 'Showtime',
+    BOOKING: 'Booking'
 };

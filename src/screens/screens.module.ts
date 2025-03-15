@@ -14,5 +14,6 @@ import { Screen, ScreenSchema } from './schemas';
   ],
   controllers: [ScreensController],
   providers: [ScreensService],
+  exports: [MongooseModule]
 })
 export class ScreensModule { }

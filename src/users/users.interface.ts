@@ -1,5 +1,5 @@
 import { Role } from "../enums";
-import { User } from "./schemas/users.schema";
+import { User } from "./schemas";
 
 export type UserRole = Role.Admin | Role.User;
 

@@ -5,10 +5,13 @@ import { COLLECTION_NAME } from '../../constants';
 export type ScreenDocument = HydratedDocument<Screen>;
 
 interface Seat {
+    _id: Types.ObjectId;
     row: string;
     number: number;
-    status: string;
+    status: string; // 'available', 'reserved', hoặc 'booked'
     price: number;
+    reservedUntil?: Date; // Thời gian hết hạn giữ chỗ
+    reservedBy?: Types.ObjectId; // ID của booking giữ chỗ
 }
 
 @Schema({ timestamps: true })
@@ -17,39 +20,45 @@ export class Screen {
     theaterId: Types.ObjectId;
 
     @Prop({ required: true })
-    name: string; // Ví dụ: Phòng 1, Phòng 2
+    name: string;
 
     @Prop({ required: true })
-    capacity: number; // Tổng số ghế
+    capacity: number;
 
-    @Prop({ type: [{ row: String, number: Number, status: String, price: Number }], default: [] })
+    @Prop({
+        type: [{
+            row: String,
+            number: Number,
+            status: String,
+            price: Number,
+            reservedUntil: Date,
+            reservedBy: { type: Types.ObjectId, ref: COLLECTION_NAME.BOOKING }
+        }], default: []
+    })
     seats: Seat[];
 }
 
 export const ScreenSchema = SchemaFactory.createForClass(Screen);
 
-// Middleware tự động tạo ghế trước khi lưu vào DB
+// Middleware giữ nguyên như code của bạn
 ScreenSchema.pre<ScreenDocument>('save', function (next) {
-    if (this.seats.length === 0) { // Chỉ tạo ghế nếu chưa có
+    if (this.seats.length === 0) {
         const totalSeats = this.capacity;
-        const seatsPerRow = 10; // Mỗi hàng có 10 ghế
-        const totalRows = Math.ceil(totalSeats / seatsPerRow); // Tính số hàng thực tế
+        const seatsPerRow = 10;
+        const totalRows = Math.ceil(totalSeats / seatsPerRow);
+        const rows = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.slice(0, totalRows).split('');
 
-        const rows = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.slice(0, totalRows).split(''); // Chuyển thành mảng
+        const cheapRange = Math.floor(totalRows * 0.2);
+        const mediumRange = Math.floor(totalRows * 0.3);
 
-        // Xác định các nhóm hàng
-        const cheapRange = Math.floor(totalRows * 0.2); // 20% hàng đầu & cuối
-        const mediumRange = Math.floor(totalRows * 0.3); // 30% hàng gần giữa
-
-        // Ánh xạ hàng vào giá vé
         const priceMapping: { [key: string]: number } = {};
         [...rows].forEach((row, index) => {
             if (index < cheapRange || index >= totalRows - cheapRange) {
-                priceMapping[row] = 50; // Rẻ nhất
+                priceMapping[row] = 50;
             } else if (index < cheapRange + mediumRange || index >= totalRows - (cheapRange + mediumRange)) {
-                priceMapping[row] = 75; // Trung bình
+                priceMapping[row] = 75;
             } else {
-                priceMapping[row] = 100; // Đắt nhất
+                priceMapping[row] = 100;
             }
         });
 
@@ -57,9 +66,11 @@ ScreenSchema.pre<ScreenDocument>('save', function (next) {
         for (let i = 0; i < totalSeats; i++) {
             const row = rows[Math.floor(i / seatsPerRow)];
             const number = (i % seatsPerRow) + 1;
-            const price = priceMapping[row]; // Lấy giá từ mapping
-
-            generatedSeats.push({ row, number, status: 'available', price });
+            const price = priceMapping[row];
+            generatedSeats.push({
+                row, number, status: 'available', price,
+                _id: new Types.ObjectId
+            });
         }
         this.seats = generatedSeats;
     }
