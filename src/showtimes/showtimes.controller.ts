@@ -1,6 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Query } from '@nestjs/common';
 import { ShowtimesService } from './showtimes.service';
-import { Public } from '../decorators/public.decorator';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam } from '@nestjs/swagger';
 import { formatResponse } from '../utils';
 import { CreateShowtimeDto, SearchShowtimeDto, UpdateShowtimeDto } from './dto';
@@ -10,7 +9,6 @@ export class ShowtimesController {
   constructor(private readonly showtimesService: ShowtimesService) { }
 
   @Post()
-  @Public()
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create showtime' })
   @ApiBody({ type: CreateShowtimeDto })
@@ -19,7 +17,6 @@ export class ShowtimesController {
     return formatResponse(result);
   }
 
-  @Public()
   @ApiOperation({ summary: 'Find showtimes by movie and date' })
   @Get()
   async findAll(@Query() queryParams: SearchShowtimeDto) {
@@ -28,7 +25,6 @@ export class ShowtimesController {
   }
 
   @ApiOperation({ summary: 'Find showtime' })
-  @Public()
   @ApiParam({ name: 'id', type: String, description: 'Showtime ID', example: '67c919f0d284fdf03469bf48' })
   @Get(':id')
   async findOne(@Param('id') id: string) {

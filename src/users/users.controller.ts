@@ -28,7 +28,6 @@ export class UsersController {
     return formatResponse<UserWithoutPassword>(item);
   }
 
-  @Public()
   @Get()
   @ApiOperation({ summary: 'Get users' })
   async findAll() {
@@ -42,7 +41,6 @@ export class UsersController {
     return formatResponse<User>(item);
   }
 
-  @Public()
   @Put(':id')
   @ApiOperation({ summary: 'Update user' })
   async updateUser(@Param('id') id: string, @Body() payload: UpdateUserDto) {
